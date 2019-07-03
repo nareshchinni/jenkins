@@ -1,0 +1,44 @@
+- name: Setup Jenkins Master
+  hosts: linux
+  gather_facts: no
+  become: yes
+
+  tasks:
+    - name: Install Java
+      package:
+         name: 'java-1.8.0-openjdk'
+         state: latest
+
+    - name: download jenkins
+      get_url:
+         validate_certs: no
+         url: https://e2-artifactory.resource.ca.corp.thales/artifactory/ansible/jenkins-2.164.1-1.1.noarch.rpm
+         dest: /home/e2admin/jenkins-2.164.1-1.1.noarch.rpm
+
+    - name: install jenkins
+      yum:
+         name: /home/e2admin/jenkins-2.164.1-1.1.noarch.rpm
+         state: present
+
+    - name: start jenkins
+      systemd:
+         name: jenkins
+         state: started
+
+    - name: enable jenkins
+      systemd:
+         name: jenkins
+         enabled: true
+
+    - name: sleep for 30 seconds and continue with play
+      pause:
+        minutes: 1
+
+    - name: init password jenkin
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      changed_when: false
+      register: result
+
+    - name: print init password jenkins
+      debug:
+         var: result.stdout

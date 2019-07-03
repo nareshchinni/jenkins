@@ -1,0 +1,7 @@
+- name: Jenkins Master Creations
+  hosts: linux
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Jenkins installation
+      script: /etc/ansible/playbooks/backoutjenkins.sh
